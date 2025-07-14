@@ -6,7 +6,9 @@ const CommunityContext = createContext(null);
 
 export const CommunityProvider = ({ children }) => {
     const { toast } = useToast();
-    const { getAllUsers } = useAuth();
+    const auth = useAuth();
+    const getAllUsers = auth?.getAllUsers || (() => []);
+
     const [profiles, setProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
 
