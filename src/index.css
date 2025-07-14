@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 8%; /* Dark background, e.g., #141414 */
+    --foreground: 0 0% 95%; /* Light foreground, e.g., #F2F2F2 */
+
+    --card: 0 0% 12%; /* Slightly lighter dark for cards, e.g., #1F1F1F */
+    --card-foreground: 0 0% 90%; /* Light text for cards */
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 35 80% 60%; /* Gold/Bronze, e.g., #D4AF37 (Metallic Gold) or #B8860B (DarkGoldenRod) */
+    --primary-foreground: 0 0% 10%; /* Dark text on primary for contrast */
+    --primary-rgb: 212, 175, 55; /* For box-shadow */
+
+
+    --secondary: 35 60% 75%; /* Lighter Gold/Beige, e.g., #E6CBA8 */
+    --secondary-foreground: 0 0% 15%; /* Dark text on secondary */
+
+    --muted: 0 0% 20%; /* Muted dark gray */
+    --muted-foreground: 0 0% 60%; /* Lighter gray for muted text */
+
+    --accent: 30 70% 50%; /* A richer, slightly darker gold/orange for accents */
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 72% 51%; /* Red for destructive actions */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 35 30% 40%; /* Gold-tinted border */
+    --input: 0 0% 10%; /* Dark input background */
+    --ring: 35 80% 65%; /* Ring color matching primary, slightly lighter */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 35 80% 60%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 35 60% 75%;
+    --secondary-foreground: 0 0% 15%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 30 70% 50%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 35 30% 40%;
+    --input: 0 0% 10%;
+    --ring: 35 80% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+.glassmorphism {
+  background: rgba(31, 31, 31, 0.6); /* --card with opacity */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsla(var(--primary), 0.2); /* Border with primary color hint */
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent;
+}
+
+.cta-button-glow {
+  @apply shadow-[0_0_15px_theme(colors.primary),0_0_30px_theme(colors.primary)/70,0_0_45px_theme(colors.primary)/40];
+}
+
+.h1-seo {
+  @apply text-4xl font-extrabold tracking-tight lg:text-5xl gradient-text;
+}
+.h2-seo {
+  @apply text-3xl font-semibold tracking-tight;
+}
+.h3-seo {
+  @apply text-2xl font-semibold tracking-tight;
+}
+
+/* Custom scrollbar for a more modern look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background) / 0.5);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.7);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
