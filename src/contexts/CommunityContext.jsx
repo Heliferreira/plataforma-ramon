@@ -16,7 +16,9 @@ export const CommunityProvider = ({ children }) => {
         setLoading(true);
         try {
             const storedProfiles = JSON.parse(localStorage.getItem('mentorship_community_profiles') || '{}');
-            const allUsers = getAllUsers().filter(u => u.role === 'student');
+            
+            // ✅ Aqui está a correção que evita quebra quando getAllUsers() retorna null
+            const allUsers = (getAllUsers() || []).filter(u => u.role === 'student');
 
             const mergedProfiles = allUsers.map(u => {
                 const baseProfile = {
@@ -50,7 +52,6 @@ export const CommunityProvider = ({ children }) => {
             const newProfiles = { ...storedProfiles, [userId]: updatedProfile };
             localStorage.setItem('mentorship_community_profiles', JSON.stringify(newProfiles));
             
-            // Force a reload of all profiles to ensure consistency everywhere
             loadProfiles(); 
         } catch (error) {
             console.error("Failed to update profile:", error);
@@ -59,7 +60,6 @@ export const CommunityProvider = ({ children }) => {
     };
 
     const getProfile = (userId) => {
-        // This function now gets the most up-to-date data from the state
         return profiles.find(p => p.id === userId) || null;
     };
 

@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '@/components/Layout';
-import { AuthProvider as SupabaseAuthProvider, useAuth } from '@/contexts/SupabaseAuthContext';
+import { useAuth, AuthProvider } from '@/contexts/AuthContext'; // ⬅️ Aqui adicionamos o AuthProvider certo
 import { ActivitiesProvider } from '@/contexts/ActivitiesContext';
 import { ContentProvider } from '@/contexts/ContentContext';
 import { ProgressProvider } from '@/contexts/ProgressContext';
@@ -11,6 +11,7 @@ import { CommunityProvider } from '@/contexts/CommunityContext';
 import { CalendarProvider } from '@/contexts/CalendarContext';
 import { Loader2 } from 'lucide-react';
 
+// ⬇️ Lazy imports de todas as páginas
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const RodrigoLeitePage = lazy(() => import('@/pages/RodrigoLeitePage'));
 const SobreMentoriaPage = lazy(() => import('@/pages/SobreMentoriaPage'));
@@ -38,38 +39,33 @@ const AdminContentPage = lazy(() => import('@/pages/admin/AdminContentPage.jsx')
 const AdminMentorshipActivitiesPage = lazy(() => import('@/pages/admin/AdminMentorshipActivitiesPage.jsx'));
 const AdminGeneralActivitiesPage = lazy(() => import('@/pages/admin/AdminGeneralActivitiesPage.jsx'));
 const AdminEventsPage = lazy(() => import('@/pages/admin/AdminEventsPage.jsx'));
+
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage.jsx'));
 
-
+// ⬇️ Componente de carregamento para fallback
 const PageLoader = () => (
   <div className="flex justify-center items-center h-screen">
     <Loader2 className="h-12 w-12 animate-spin text-primary" />
   </div>
 );
 
+// ⬇️ Rota protegida por autenticação e tipo de usuário
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return <PageLoader />;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (adminOnly && user?.profile?.role !== 'admin') {
-    return <Navigate to="/student/profile" replace />;
-  }
+  if (loading) return <PageLoader />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (adminOnly && user?.role !== 'admin') return <Navigate to="/student/profile" replace />;
   
   return children;
 };
 
-
+// ⬇️ Rotas animadas
 const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes>
+        {/* Páginas públicas */}
         <Route path="/" element={<Layout><Suspense fallback={<PageLoader />}><HomePage /></Suspense></Layout>} />
         <Route path="/rodrigo-leite" element={<Layout><Suspense fallback={<PageLoader />}><RodrigoLeitePage /></Suspense></Layout>} />
         <Route path="/sobre-a-mentoria" element={<Layout><Suspense fallback={<PageLoader />}><SobreMentoriaPage /></Suspense></Layout>} />
@@ -77,9 +73,9 @@ const AnimatedRoutes = () => {
         <Route path="/depoimentos" element={<Layout><Suspense fallback={<PageLoader />}><DepoimentosPage /></Suspense></Layout>} />
         <Route path="/blog" element={<Layout><Suspense fallback={<PageLoader />}><BlogPage /></Suspense></Layout>} />
         <Route path="/contato" element={<Layout><Suspense fallback={<PageLoader />}><ContactPage /></Suspense></Layout>} />
-        
         <Route path="/login" element={<Layout><Suspense fallback={<PageLoader />}><AuthPage mode="login" /></Suspense></Layout>} />
-        
+
+        {/* Páginas do aluno */}
         <Route path="/student/dashboard" element={<ProtectedRoute><Layout><Suspense fallback={<PageLoader />}><StudentDashboardPage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/student/profile" element={<ProtectedRoute><Layout><Suspense fallback={<PageLoader />}><StudentProfilePage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/student/courses" element={<ProtectedRoute><Layout><Suspense fallback={<PageLoader />}><StudentCoursesPage /></Suspense></Layout></ProtectedRoute>} />
@@ -92,24 +88,26 @@ const AnimatedRoutes = () => {
         <Route path="/student/community" element={<ProtectedRoute><Layout><Suspense fallback={<PageLoader />}><StudentCommunityPage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/student/community/:userId" element={<ProtectedRoute><Layout><Suspense fallback={<PageLoader />}><StudentCommunityProfilePage /></Suspense></Layout></ProtectedRoute>} />
 
+        {/* Páginas do admin */}
         <Route path="/admin/dashboard" element={<ProtectedRoute adminOnly={true}><Layout><Suspense fallback={<PageLoader />}><AdminDashboardPage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute adminOnly={true}><Layout><Suspense fallback={<PageLoader />}><AdminUsersPage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/admin/content" element={<ProtectedRoute adminOnly={true}><Layout><Suspense fallback={<PageLoader />}><AdminContentPage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/admin/mentorship-activities" element={<ProtectedRoute adminOnly={true}><Layout><Suspense fallback={<PageLoader />}><AdminMentorshipActivitiesPage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/admin/general-activities" element={<ProtectedRoute adminOnly={true}><Layout><Suspense fallback={<PageLoader />}><AdminGeneralActivitiesPage /></Suspense></Layout></ProtectedRoute>} />
         <Route path="/admin/events" element={<ProtectedRoute adminOnly={true}><Layout><Suspense fallback={<PageLoader />}><AdminEventsPage /></Suspense></Layout></ProtectedRoute>} />
-        
+
+        {/* Página 404 */}
         <Route path="*" element={<Layout><Suspense fallback={<PageLoader />}><NotFoundPage /></Suspense></Layout>} />
       </Routes>
     </AnimatePresence>
   );
-}
+};
 
-
+// ⬇️ App principal com todos os providers organizados
 function App() {
   return (
     <Router>
-      <SupabaseAuthProvider>
+      <AuthProvider> {/* ⬅️ Adicionamos aqui! */}
         <ActivitiesProvider>
           <ContentProvider>
             <ProgressProvider>
@@ -123,7 +121,7 @@ function App() {
             </ProgressProvider>
           </ContentProvider>
         </ActivitiesProvider>
-      </SupabaseAuthProvider>
+      </AuthProvider>
     </Router>
   );
 }
